@@ -6,4 +6,5 @@ set(CMAKE_CXX_STANDARD 17)
 add_executable(App
         main.cpp
         problems/day1/day1.cpp
+        problems/day2/day2.cpp
         )
