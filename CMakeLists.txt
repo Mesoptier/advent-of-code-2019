@@ -12,4 +12,5 @@ add_executable(App
         problems/day5/day5.cpp
         problems/day6/day6.cpp
         problems/day7/day7.cpp
+        problems/day8/day8.cpp
         )
