@@ -6,5 +6,5 @@ set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} "-static")
 
 add_executable(App
         main.cpp
-        problems/day13/solve.cpp
+        problems/day14/solve.cpp
         )
