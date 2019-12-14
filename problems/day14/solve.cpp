@@ -1,6 +1,6 @@
 #include "solve.h"
-#include <regex>
 #include <iostream>
+#include <sstream>
 
 namespace Day14 {
 
@@ -11,7 +11,7 @@ namespace Day14 {
 
     Quant solve2(std::istream& input) {
         const auto recipes = readRecipes(input);
-        Quant maxOre = 1e12;
+        const Quant maxOre = 1e12;
 
         // Exponential search
         int maxFuel = 1;
