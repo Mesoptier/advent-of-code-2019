@@ -1,12 +1,12 @@
 #include <fstream>
 #include <iostream>
 
-#include "problems/day14/solve.h"
+#include "problems/day15/solve.h"
 
 int main() {
     std::ifstream input;
-    input.open("../inputs/day14.txt");
-    std::cout << Day14::solve2(input) << std::endl;
+    input.open("../inputs/day15.txt");
+    std::cout << Day15::solve1(input) << std::endl;
     return 0;
 }
 
