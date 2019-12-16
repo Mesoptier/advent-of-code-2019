@@ -85,7 +85,7 @@ namespace Day16 {
     int get_digits(const std::vector<int>& signal, int offset, int length) {
         int result = 0;
         for (int i = 0; i < length; ++i) {
-            result += signal[offset + i] * pow(10, length - i - 1);
+            result += signal[offset + i] * (int) pow(10, length - i - 1);
         }
         return result;
     }
