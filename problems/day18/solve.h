@@ -88,26 +88,89 @@ namespace Day18 {
 //    template<class Cost, class Node>
 //    bool operator>(const PriorityNode<Cost, Node>& a, const PriorityNode<Cost, Node>& b);
 
-    using Key = char;
-    using KeySet = std::bitset<26>;
+    bool is_key(char c);
+    bool is_door(char c);
 
-    inline void insert_key(KeySet& key_set, Key key) {
-        key_set[key - 'a'] = true;
+    using Node = uint32_t;
+    using Keyset = uint32_t;
+
+    using NodeKeyset = uint64_t;
+    constexpr uint64_t NODE_MASK = (~0ULL << 32u);
+    constexpr uint64_t KEYSET_MASK = ~NODE_MASK;
+
+    inline void set_node(NodeKeyset& nks, Node node) {
+        nks = (nks & KEYSET_MASK) | ((NodeKeyset) node << 32u);
+    }
+    inline Node get_node(NodeKeyset nks) {
+        return nks >> 32u;
+    }
+    inline void set_keyset(NodeKeyset& nks, Keyset keyset) {
+        nks = (nks & NODE_MASK) | keyset;
+    }
+    inline Keyset get_keyset(NodeKeyset nks) {
+        return nks;
     }
 
-    inline bool get_key(const KeySet& key_set, Key key) {
-        return key_set[key - 'a'];
+    // Keys:
+    // a = 0b0010...01
+    // b = 0b0010...10
+    // ...
+    // z = 0b0011...00
+    //
+    // Doors:
+    // A = 0b0100...01
+    // B = 0b0100...10
+    // ...
+    // Z = 0b0101...00
+    //
+    // Entrance:
+    // @ = 0b1000...00
+
+    constexpr uint32_t KEY_BIT = 1u << 26u;
+    constexpr uint32_t DOOR_BIT = 1u << 27u;
+    constexpr uint32_t ENTRANCE_BIT = 1u << 28u;
+
+    inline Node node_key(char c) {
+        return KEY_BIT + (1u << (uint32_t) (c - 'a'));
+    }
+    inline Node node_door(char c) {
+        return DOOR_BIT + (1u << (uint32_t) (c - 'A'));
+    }
+    inline Node node_entrance() {
+        return ENTRANCE_BIT;
+    }
+    inline Node node(char c) {
+        if (c == '@') return node_entrance();
+        if (is_key(c)) return node_key(c);
+        if (is_door(c)) return node_door(c);
+        throw std::invalid_argument("invalid node char");
+    }
+
+    inline bool is_key(Node node) {
+        return node & KEY_BIT;
+    }
+    inline bool is_door(Node node) {
+        return node & DOOR_BIT;
+    }
+    inline bool is_entrance(Node node) {
+        return node & ENTRANCE_BIT;
+    }
+
+    inline Keyset insert_key(Keyset keys, Node key) {
+        // assert(is_key(key));
+        return keys | (key & ~KEY_BIT);
+    }
+    inline bool has_key(Keyset keys, Node key) {
+        // assert(is_key(key) || is_door(key));
+        return keys & key;
     }
 
     Grid<char> parse_input(std::istream& input);
     Coord find_entrance(const Grid<char>& grid);
-    KeySet find_keys(const Grid<char>& grid);
-    int solve(const Grid<char>& grid, const KeySet& start, const KeySet& goal);
+    Keyset find_keys(const Grid<char>& grid);
+    int solve(const Grid<char>& grid, const Keyset& start, const Keyset& goal);
     std::vector<Grid<char>> split_grid(const Grid<char>& grid, const Coord& split_point);
-    std::vector<std::pair<char, int>> reachable_nodes(const Grid<char>& grid, const Coord& from);
-
-    bool is_key(char c);
-    bool is_door(char c);
+    std::vector<std::pair<Node, int>> reachable_nodes(const Grid<char>& grid, const Coord& from);
 
     int solve1(std::istream& input);
     int solve2(std::istream& input);

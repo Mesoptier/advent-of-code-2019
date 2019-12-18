@@ -5,13 +5,13 @@ namespace Day18 {
 
     int solve1(std::istream& input) {
         auto grid = parse_input(input);
-        KeySet goal = find_keys(grid);
-        return solve(grid, KeySet(), goal);
+        Keyset goal = find_keys(grid);
+        return solve(grid, 0, goal);
     }
 
     int solve2(std::istream& input) {
         auto grid = parse_input(input);
-        KeySet goal = find_keys(grid);
+        Keyset goal = find_keys(grid);
 
         // Replace squares around the original entrance
         auto entrance = find_entrance(grid);
@@ -25,7 +25,7 @@ namespace Day18 {
         // The final answer is the sum of the answer of each vault.
         int total_steps = 0;
         for (const auto& vault : split_grid(grid, entrance)) {
-            KeySet start = find_keys(vault);
+            Keyset start = find_keys(vault);
             start ^= goal;
             total_steps += solve(vault, start, goal);
         }
@@ -62,62 +62,63 @@ namespace Day18 {
         throw std::logic_error("entrance not found");
     }
 
-    KeySet find_keys(const Grid<char>& grid) {
-        KeySet keys;
+    Keyset find_keys(const Grid<char>& grid) {
+        Keyset keys = 0;
         for (auto kv : grid) {
-            if ('a' <= kv.second && kv.second <= 'z') {
-                insert_key(keys, kv.second);
+            if (is_key(kv.second)) {
+                keys = insert_key(keys, node_key(kv.second));
             }
         }
         return keys;
     }
 
-    int solve(const Grid<char>& grid, const KeySet& start, const KeySet& goal) {
+    int solve(const Grid<char>& grid, const Keyset& start, const Keyset& goal) {
         // Compute adjacency list
-        std::unordered_map<char, std::vector<std::pair<char, int>>> adjacency;
+        std::unordered_map<Node, std::vector<std::pair<Node, int>>> adjacency;
         for (auto kv : grid) {
             if (kv.second == '@' || is_key(kv.second) || is_door(kv.second)) {
-                adjacency[kv.second] = reachable_nodes(grid, kv.first);
+                adjacency[node(kv.second)] = reachable_nodes(grid, kv.first);
             }
         }
 
-        using Node = std::pair<char, KeySet>;
-        std::priority_queue<PriorityNode<int, Node>, std::vector<PriorityNode<int, Node>>, std::greater<>> queue;
-        std::unordered_map<Node, int> cost;
+        std::priority_queue<PriorityNode<int, NodeKeyset>, std::vector<PriorityNode<int, NodeKeyset>>, std::greater<>> queue;
+        std::unordered_map<NodeKeyset, int> cost;
 
-        Node start_node = {'@', start};
+        NodeKeyset start_node = 0;
+        set_node(start_node, node_entrance());
+        set_keyset(start_node, start);
+
         queue.emplace(0, start_node);
         cost.emplace(start_node, 0);
 
         while (!queue.empty()) {
-            auto pq_node = queue.top();
+            const auto current = queue.top().node;
+            const auto current_cost = queue.top().cost;
             queue.pop();
 
-            auto current = pq_node.node;
-            auto current_cost = pq_node.cost;
+            const auto current_keyset = get_keyset(current);
 
             if (cost[current] < current_cost) {
                 continue;
             }
 
             // Found all keys
-            if (current.second == goal) {
+            if (current_keyset == goal) {
                 return cost[current];
             }
 
-            for (const auto& adj_node : adjacency[current.first]) {
+            for (const auto& adj_node : adjacency[get_node(current)]) {
                 auto neighbor = current;
-                neighbor.first = adj_node.first;
+                Node node = adj_node.first;
+                set_node(neighbor, node);
 
-                if (is_door(neighbor.first)) {
-                    // Skip closed doors
-                    if (!get_key(current.second, tolower(neighbor.first))) {
+                if (!has_key(current_keyset, node)) {
+                    if (is_door(node)) {
+                        // Skip closed doors
                         continue;
-                    }
-                } else if (is_key(neighbor.first)) {
-                    // Collect keys
-                    if (!get_key(current.second, neighbor.first)) {
-                        insert_key(neighbor.second, neighbor.first);
+                    } else /*if (is_key(node))*/ {
+                        // Collect keys
+                        set_keyset(neighbor, insert_key(current_keyset, node));
                     }
                 }
 
@@ -157,8 +158,8 @@ namespace Day18 {
         return grids;
     }
 
-    std::vector<std::pair<char, int>> reachable_nodes(const Grid<char>& grid, const Coord& from) {
-        std::vector<std::pair<char, int>> nodes;
+    std::vector<std::pair<Node, int>> reachable_nodes(const Grid<char>& grid, const Coord& from) {
+        std::vector<std::pair<Node, int>> nodes;
 
         std::queue<Coord> queue;
         std::unordered_map<Coord, int> cost;
@@ -185,7 +186,7 @@ namespace Day18 {
                 cost[neighbor] = cost[current] + 1;
 
                 if (is_key(c) || is_door(c)) {
-                    nodes.emplace_back(c, cost[neighbor]);
+                    nodes.emplace_back(node(c), cost[neighbor]);
                     continue;
                 }
 
