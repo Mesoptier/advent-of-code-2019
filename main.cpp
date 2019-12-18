@@ -2,7 +2,7 @@
 #include <iostream>
 #include <chrono>
 
-#include "problems/day16/solve.h"
+#include "problems/day17/solve.h"
 
 #define TIMING_START auto __timing_start = std::chrono::high_resolution_clock::now();
 #define TIMING_FINISH \
@@ -12,10 +12,10 @@
 
 int main() {
     std::ifstream input;
-    input.open("../inputs/day16.txt");
-    TIMING_START
-    std::cout << Day16::solve2(input) << std::endl;
-    TIMING_FINISH
+    input.open("../inputs/day17.txt");
+//    TIMING_START
+    std::cout << Day17::solve2(input) << std::endl;
+//    TIMING_FINISH
     return 0;
 }
 
