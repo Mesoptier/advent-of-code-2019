@@ -56,6 +56,8 @@ namespace Day18 {
                     return { x - 1, y };
                 case East:
                     return { x + 1, y };
+                default:
+                    throw std::invalid_argument("invalid direction");
             }
         }
     };
@@ -63,17 +65,50 @@ namespace Day18 {
     template<class V>
     using Grid = std::unordered_map<Coord, V>;
 
+    template<class Cost, class Node>
+    struct PriorityNode {
+        Cost cost;
+        Node node;
+
+        PriorityNode(Cost cost, Node node) : cost(cost), node(node) {}
+
+        bool operator<(const PriorityNode& rhs) const {
+            return cost < rhs.cost;
+        }
+        bool operator>(const PriorityNode& rhs) const {
+            return rhs < *this;
+        }
+        bool operator<=(const PriorityNode& rhs) const {
+            return !(rhs < *this);
+        }
+        bool operator>=(const PriorityNode& rhs) const {
+            return !(*this < rhs);
+        }
+    };
+
+//    template<class Cost, class Node>
+//    bool operator>(const PriorityNode<Cost, Node>& a, const PriorityNode<Cost, Node>& b);
+
     using Key = char;
     using KeySet = std::bitset<26>;
 
-    void insert_key(KeySet& key_set, Key key);
-    bool get_key(const KeySet& key_set, Key key);
+    inline void insert_key(KeySet& key_set, Key key) {
+        key_set[key - 'a'] = true;
+    }
+
+    inline bool get_key(const KeySet& key_set, Key key) {
+        return key_set[key - 'a'];
+    }
 
     Grid<char> parse_input(std::istream& input);
     Coord find_entrance(const Grid<char>& grid);
     KeySet find_keys(const Grid<char>& grid);
     int solve(const Grid<char>& grid, const KeySet& start, const KeySet& goal);
     std::vector<Grid<char>> split_grid(const Grid<char>& grid, const Coord& split_point);
+    std::vector<std::pair<char, int>> reachable_nodes(const Grid<char>& grid, const Coord& from);
+
+    bool is_key(char c);
+    bool is_door(char c);
 
     int solve1(std::istream& input);
     int solve2(std::istream& input);

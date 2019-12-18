@@ -29,14 +29,6 @@ namespace Day18 {
         return total_steps;
     }
 
-    void insert_key(KeySet& key_set, Key key) {
-        key_set[key - 'a'] = true;
-    }
-
-    bool get_key(const KeySet& key_set, Key key) {
-        return key_set[key - 'a'];
-    }
-
     Grid<char> parse_input(std::istream& input) {
         Grid<char> grid;
 
@@ -46,13 +38,13 @@ namespace Day18 {
             char c = input.get();
 
             if (c == '\n') {
-                y++;
+                ++y;
                 x = 0;
                 continue;
             }
 
             grid[{x, y}] = c;
-            x++;
+            ++x;
         }
 
         return grid;
@@ -78,59 +70,67 @@ namespace Day18 {
     }
 
     int solve(const Grid<char>& grid, const KeySet& start, const KeySet& goal) {
-        auto entrance = find_entrance(grid);
-
-        using Node = std::pair<Coord, KeySet>;
-        std::queue<Node> queue;
-        std::unordered_map<Node, int> cost;
-
-        queue.emplace(entrance, start);
-        cost.emplace(queue.front(), 0);
-
-        while (!queue.empty()) {
-            const auto node = queue.front();
-            queue.pop();
-
-            // Found all keys
-            if (node.second == goal) {
-                return cost[node];
-            }
-
-            for (int i = 1; i <= 4; ++i) {
-                auto dir = static_cast<Direction>(i);
-
-                auto neighbor = node;
-                neighbor.first = node.first.step(dir);
-
-                auto c = grid.at(neighbor.first);
-
-                // Skip walls
-                if (c == '#') {
-                    continue;
-                }
-
-                // Skip closed doors
-                if ('A' <= c && c <= 'Z') {
-                    if (!get_key(node.second, tolower(c))) {
-                        continue;
-                    }
-                }
-
-                // Collect keys
-                if ('a' <= c && c <= 'z') {
-                    if (!get_key(node.second, c)) {
-                        insert_key(neighbor.second, c);
-                    }
-                }
-
-                // Already discovered this node
-                if (cost.count(neighbor) != 0) {
-                    continue;
-                }
-                cost.emplace(neighbor, cost[node] + 1);
-                queue.push(neighbor);
+        // Compute adjacency list
+        std::unordered_map<char, std::vector<std::pair<char, int>>> adjacency;
+        for (auto kv : grid) {
+            if (kv.second == '@' || is_key(kv.second) || is_door(kv.second)) {
+                adjacency[kv.second] = reachable_nodes(grid, kv.first);
             }
         }
+
+        using Node = std::pair<char, KeySet>;
+        std::priority_queue<PriorityNode<int, Node>, std::vector<PriorityNode<int, Node>>, std::greater<>> queue;
+        std::unordered_map<Node, int> cost;
+
+        Node start_node = {'@', start};
+        queue.emplace(0, start_node);
+        cost.emplace(start_node, 0);
+
+        while (!queue.empty()) {
+            auto pq_node = queue.top();
+            queue.pop();
+
+            auto current = pq_node.node;
+            auto current_cost = pq_node.cost;
+
+            if (cost[current] < current_cost) {
+                continue;
+            }
+
+            // Found all keys
+            if (current.second == goal) {
+                return cost[current];
+            }
+
+            for (const auto& adj_node : adjacency[current.first]) {
+                auto neighbor = current;
+                neighbor.first = adj_node.first;
+
+                if (is_door(neighbor.first)) {
+                    // Skip closed doors
+                    if (!get_key(current.second, tolower(neighbor.first))) {
+                        continue;
+                    }
+                } else if (is_key(neighbor.first)) {
+                    // Collect keys
+                    if (!get_key(current.second, neighbor.first)) {
+                        insert_key(neighbor.second, neighbor.first);
+                    }
+                }
+
+                int neighbor_cost = current_cost + adj_node.second;
+
+                auto it = cost.find(neighbor);
+                if (it != cost.end() && it->second < neighbor_cost) {
+                    continue;
+                }
+
+                cost.emplace(neighbor, neighbor_cost);
+                queue.emplace(neighbor_cost, neighbor);
+            }
+        }
+
+        return -1;
     }
 
     std::vector<Grid<char>> split_grid(const Grid<char>& grid, const Coord& split_point) {
@@ -152,5 +152,52 @@ namespace Day18 {
         }
 
         return grids;
+    }
+
+    std::vector<std::pair<char, int>> reachable_nodes(const Grid<char>& grid, const Coord& from) {
+        std::vector<std::pair<char, int>> nodes;
+
+        std::queue<Coord> queue;
+        std::unordered_map<Coord, int> cost;
+
+        queue.push(from);
+        cost[from] = 0;
+
+        while (!queue.empty()) {
+            auto current = queue.front();
+            queue.pop();
+
+            for (int i = 1; i <= 4; ++i) {
+                auto dir = static_cast<Direction>(i);
+                auto neighbor = current.step(dir);
+
+                auto c = grid.at(neighbor);
+
+                // Skip walls
+                if (c == '#') continue;
+
+                // Skip discovered nodes
+                if (cost.count(neighbor) != 0) continue;
+
+                cost[neighbor] = cost[current] + 1;
+
+                if (is_key(c) || is_door(c)) {
+                    nodes.emplace_back(c, cost[neighbor]);
+                    continue;
+                }
+
+                queue.push(neighbor);
+            }
+        }
+
+        return nodes;
+    }
+
+    bool is_key(char c) {
+        return 'a' <= c && c <= 'z';
+    }
+
+    bool is_door(char c) {
+        return 'A' <= c && c <= 'Z';
     }
 }
