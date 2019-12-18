@@ -13,6 +13,7 @@ namespace Day18 {
         auto grid = parse_input(input);
         KeySet goal = find_keys(grid);
 
+        // Replace squares around the original entrance
         auto entrance = find_entrance(grid);
         for (int x = -1; x <= 1; ++x) {
             for (int y = -1; y <= 1; ++y) {
@@ -20,6 +21,8 @@ namespace Day18 {
             }
         }
 
+        // Solve each vault separately, assuming all doors without the key in the same vault are always opened.
+        // The final answer is the sum of the answer of each vault.
         int total_steps = 0;
         for (const auto& vault : split_grid(grid, entrance)) {
             KeySet start = find_keys(vault);

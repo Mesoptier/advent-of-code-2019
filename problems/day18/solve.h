@@ -16,7 +16,6 @@ namespace Day18 {
         West = 3,
         East = 4,
     };
-    Direction reverse(Direction direction);
 
     struct Coord {
         int x;
