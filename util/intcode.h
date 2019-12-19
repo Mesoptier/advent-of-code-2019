@@ -2,6 +2,19 @@
 
 #include <array>
 #include <queue>
+#include <cmath>
+
+namespace {
+    int pow10(int n) {
+        if (n == 0) return 1;
+        if (n == 1) return 10;
+        if (n == 2) return 100;
+        if (n == 3) return 1000;
+        if (n == 4) return 10000;
+        if (n == 5) return 100000;
+        throw std::invalid_argument("pow10 only supports 0 <= n <= 5");
+    }
+}
 
 namespace intcode {
 
@@ -15,6 +28,31 @@ namespace intcode {
         std::queue<Int> output;
         std::queue<Int> input;
         bool halted = false;
+
+        inline int param_mode(int n) {
+            return (at(ip) / pow10(n + 2)) % 10;
+        }
+
+        Int param_pos(int n) {
+            switch (param_mode(n)) {
+                case 0: // Position mode
+                case 1: // Immediate mode
+                    return at(ip + 1 + n);
+                case 2: // Relative mode
+                    return at(ip + 1 + n) + rb;
+            }
+        }
+
+        Int param_val(int n) {
+            switch (param_mode(n)) {
+                case 0: // Position mode
+                    return at(at(ip + 1 + n));
+                case 1: // Immediate mode
+                    return at(ip + 1 + n);
+                case 2: // Relative mode
+                    return at(at(ip + 1 + n) + rb);
+            }
+        }
 
     public:
         explicit Program(std::istream& input) {
@@ -63,87 +101,60 @@ namespace intcode {
          * program is halted (return false).
          */
         bool run() {
-            // Number of parameters for each instruction
-            int nParams[] = {0, 3, 3, 1, 1, 2, 2, 3, 3, 1};
 
             while (at(ip) != 99) {
-                int instruction = at(ip);
-
                 // Get two-digit opcode
-                int opcode = instruction % 100;
-                instruction /= 100;
-
-                // Get parameters
-                std::vector<Int> params; // Position parameters
-                std::vector<Int> values; // Handled based parameter mode
-                for (int i = 0; i < nParams[opcode]; ++i) {
-                    int mode = instruction % 10;
-                    instruction /= 10;
-
-                    Int param = at(ip + 1 + i);
-
-                    switch (mode) {
-                        case 0: // Position mode
-                            params.push_back(param);
-                            values.push_back(at(param));
-                            break;
-                        case 1: // Immediate mode
-                            params.push_back(param);
-                            values.push_back(param);
-                            break;
-                        case 2: // Relative mode
-                            params.push_back(rb + param);
-                            values.push_back(at(rb + param));
-                            break;
-                    }
-                }
-
-                bool ipModified = false;
+                int opcode = at(ip) % 100;
 
                 switch (opcode) {
                     case 1: // add
-                        at(params[2]) = values[0] + values[1];
+                        at(param_pos(2)) = param_val(0) + param_val(1);
+                        ip += 4;
                         break;
                     case 2: // multiply
-                        at(params[2]) = values[0] * values[1];
+                        at(param_pos(2)) = param_val(0) * param_val(1);
+                        ip += 4;
                         break;
                     case 3: // input
                         if (input.empty()) {
                             return true;
                         }
-                        at(params[0]) = input.front();
+                        at(param_pos(0)) = input.front();
                         input.pop();
+                        ip += 2;
                         break;
                     case 4: // output
-                        output.push(values[0]);
+                        output.push(param_val(0));
+                        ip += 2;
                         break;
                     case 5: // jump-if-true
-                        if (values[0] != 0) {
-                            ip = values[1];
-                            ipModified = true;
+                        if (param_val(0) != 0) {
+                            ip = param_val(1);
+                        } else {
+                            ip += 3;
                         }
                         break;
                     case 6: // jump-if-false
-                        if (values[0] == 0) {
-                            ip = values[1];
-                            ipModified = true;
+                        if (param_val(0) == 0) {
+                            ip = param_val(1);
+                        } else {
+                            ip += 3;
                         }
                         break;
                     case 7: // less than
-                        at(params[2]) = values[0] < values[1];
+                        at(param_pos(2)) = param_val(0) < param_val(1);
+                        ip += 4;
                         break;
                     case 8: // equals
-                        at(params[2]) = values[0] == values[1];
+                        at(param_pos(2)) = param_val(0) == param_val(1);
+                        ip += 4;
                         break;
                     case 9: // adjust relative base
-                        rb += values[0];
+                        rb += param_val(0);
+                        ip += 2;
                         break;
                     default:
                         throw std::logic_error("Unknown opcode");
-                }
-
-                if (!ipModified) {
-                    ip += nParams[opcode] + 1;
                 }
             }
 
