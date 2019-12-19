@@ -14,7 +14,8 @@ int main() {
     std::ifstream input;
     input.open("../inputs/day19.txt");
     TIMING_START
-    std::cout << Day19::solve2(input) << std::endl;
+    std::cout << "Part 1: " << Day19::solve1(input) << std::endl;
+//    std::cout << "Part 2: " << Day19::solve2(input) << std::endl;
     TIMING_FINISH
     return 0;
 }
