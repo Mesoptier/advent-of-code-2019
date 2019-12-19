@@ -57,31 +57,4 @@ namespace Day19 {
         return clone.output_peek();
     }
 
-    void print_grid(const Grid<char>& grid) {
-        int minX = INT_MAX;
-        int maxX = 0;
-        int minY = INT_MAX;
-        int maxY = 0;
-
-        for (const auto& kv : grid) {
-            minX = std::min(kv.first.x, minX);
-            maxX = std::max(kv.first.x, maxX);
-            minY = std::min(kv.first.y, minY);
-            maxY = std::max(kv.first.y, maxY);
-        }
-
-        for (int y = minY; y <= maxY; ++y) {
-            for (int x = minX; x <= maxX; ++x) {
-                auto it = grid.find({x, y});
-
-                if (it == grid.end()) {
-                    std::cout << '.';
-                    continue;
-                }
-
-                std::cout << it->second;
-            }
-            std::cout << '\n';
-        }
-    }
 }

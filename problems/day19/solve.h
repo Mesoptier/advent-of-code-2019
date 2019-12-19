@@ -44,8 +44,6 @@ namespace Day19 {
     template<class V>
     using Grid = std::map<Coord, V>;
 
-    void print_grid(const Grid<char>& grid);
-
     int solve1(std::istream& input);
     int solve2(std::istream& input);
 
