@@ -7,7 +7,9 @@ using namespace intcode;
 namespace Day19 {
 
     int solve1(std::istream& input) {
-        const Program<> program(input);
+        Program<> program(input);
+        program.run(); // Run program until first input is requested
+
         Grid<char> grid;
 
         int sum = 0;
@@ -24,7 +26,8 @@ namespace Day19 {
     }
 
     int solve2(std::istream& input) {
-        const Program<> program(input);
+        Program<> program(input);
+        program.run(); // Run program until first input is requested
 
         // There are some empty spaces before this point
         const int start_x = 6;
