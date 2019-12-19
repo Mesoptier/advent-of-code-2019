@@ -80,29 +80,25 @@ namespace Day19 {
         }
     }
 
-    template<class Int>
-    Program<Int>::Program(std::istream& input) {
+    template<class Int, class Container>
+    Program<Int, Container>::Program(std::istream& input) {
         Int index = 0;
         while (input) {
             std::string s;
             if (!std::getline(input, s, ',')) {
                 break;
             }
-            memory.insert({index++, std::stoll(s)});
+            memory[index++] = std::stoll(s);
         }
     }
 
-    template<class Int>
-    Int& Program<Int>::at(Int index) {
-        auto it = memory.find(index);
-        if (it == memory.end()) {
-            return memory.insert({index, 0}).first->second;
-        }
-        return it->second;
+    template<class Int, class Container>
+    Int& Program<Int, Container>::at(Int index) {
+        return memory.at(index);
     }
 
-    template<class Int>
-    bool Program<Int>::run() {
+    template<class Int, class Container>
+    bool Program<Int, Container>::run() {
         // Number of parameters for each instruction
         int nParams[] = {0, 3, 3, 1, 1, 2, 2, 3, 3, 1};
 
@@ -191,18 +187,18 @@ namespace Day19 {
         return false;
     }
 
-    template<class Int>
-    void Program<Int>::input_push(Int value) {
+    template<class Int, class Container>
+    void Program<Int, Container>::input_push(Int value) {
         input.push(value);
     }
 
-    template<class Int>
-    Int Program<Int>::output_peek() const {
+    template<class Int, class Container>
+    Int Program<Int, Container>::output_peek() const {
         return output.front();
     }
 
-    template<class Int>
-    Int Program<Int>::output_pop() {
+    template<class Int, class Container>
+    Int Program<Int, Container>::output_pop() {
         Int value = output.front();
         output.pop();
         return value;

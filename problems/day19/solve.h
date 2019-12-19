@@ -43,10 +43,10 @@ namespace Day19 {
 
     void print_grid(const Grid<char>& grid);
 
-    template<class Int=int>
+    template<class Int = int, class Container = std::array<Int, 512>>
     class Program {
     private:
-        std::unordered_map<Int, Int> memory;
+        Container memory;
         Int ip = 0; // Instruction pointer
         Int rb = 0; // Relative base
         std::queue<Int> output;
