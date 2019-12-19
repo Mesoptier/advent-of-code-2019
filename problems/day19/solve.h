@@ -6,6 +6,9 @@
 #include <map>
 #include <queue>
 #include <unordered_map>
+#include "../../util/intcode.h"
+
+using namespace intcode;
 
 namespace Day19 {
 
@@ -42,46 +45,6 @@ namespace Day19 {
     using Grid = std::map<Coord, V>;
 
     void print_grid(const Grid<char>& grid);
-
-    template<class Int = int, class Container = std::array<Int, 512>>
-    class Program {
-    private:
-        Container memory;
-        Int ip = 0; // Instruction pointer
-        Int rb = 0; // Relative base
-        std::queue<Int> output;
-        std::queue<Int> input;
-        bool halted = false;
-
-    public:
-        explicit Program(std::istream& input);
-
-        /**
-         * Get reference to value at specified memory location.
-         */
-        Int& at(Int index);
-
-        /**
-         * Run the program until either input is needed (return true), or the
-         * program is halted (return false).
-         */
-        bool run();
-
-        /**
-         * Push a value on the input queue.
-         */
-        void input_push(Int value);
-
-        /**
-         * Peek at the next output value, without altering the output queue.
-         */
-        Int output_peek() const;
-
-        /**
-         * Get and the next value from the output queue.
-         */
-        Int output_pop();
-    };
 
     int solve1(std::istream& input);
     int solve2(std::istream& input);
