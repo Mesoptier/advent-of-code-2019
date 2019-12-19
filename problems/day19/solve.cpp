@@ -25,40 +25,19 @@ namespace Day19 {
         const Program program(input);
 
         // There are some empty spaces before this point
-        int start_x = 6;
-        int start_y = 5;
+        const int start_x = 6;
+        const int start_y = 5;
 
-        std::vector<int> max_y(start_x);
-        std::vector<int> min_y(start_x);
-
-        max_y.push_back(start_y);
-        min_y.push_back(start_y);
-
+        int y = start_y;
         for (int x = start_x + 1; x < 9999; ++x) {
-            int y;
-
-            // Find max Y
-            y = max_y[x - 1];
+            // Find the greatest Y in the beam at the current X position
             while (!get_state(program, {x, y})) {
                 ++y;
             }
-            max_y.push_back(y);
-
-            // Find min Y
-            y = min_y[x - 1];
-            while (!get_state(program, {x, y})) {
-                ++y;
-            }
-            while (get_state(program, {x, y})) {
-                ++y;
-            }
-            min_y.push_back(y - 1);
 
             // Find first position where a 100x100 square could fit in the beam
-            if (x > start_x + 100) {
-                if (min_y[x - 99] - max_y[x] == 99) {
-                    return (x - 99) * 10000 + max_y[x];
-                }
+            if (x > 99 && get_state(program, {x - 99, y + 99})) {
+                return (x - 99) * 10000 + y;
             }
         }
 
