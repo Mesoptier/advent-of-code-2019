@@ -8,11 +8,11 @@
 #include <unordered_map>
 #include "../../util/intcode.h"
 
-using namespace intcode;
+using Program = intcode::Program<int, std::array<int, 512>>;
 
 namespace Day19 {
     int solve1(std::istream& input);
     int solve2(std::istream& input);
 
-    bool get_state(const Program<>& program, int x, int y);
+    bool get_state(const Program& program, int x, int y);
 }

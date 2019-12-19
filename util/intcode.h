@@ -18,22 +18,22 @@ namespace {
 
 namespace intcode {
 
-    template<class Int = int, class Container = std::array<Int, 512>>
+    template<class int_t, class memory_t>
     class Program
     {
     private:
-        Container memory;
-        Int ip = 0; // Instruction pointer
-        Int rb = 0; // Relative base
-        std::queue<Int> output;
-        std::queue<Int> input;
+        memory_t memory;
+        int_t ip = 0; // Instruction pointer
+        int_t rb = 0; // Relative base
+        std::queue<int_t> output;
+        std::queue<int_t> input;
         bool halted = false;
 
-        inline int param_mode(int n) {
+        inline int param_mode(int n) const {
             return (at(ip) / pow10(n + 2)) % 10;
         }
 
-        Int param_pos(int n) {
+        int_t param_pos(int n) const {
             switch (param_mode(n)) {
                 case 0: // Position mode
                 case 1: // Immediate mode
@@ -43,7 +43,7 @@ namespace intcode {
             }
         }
 
-        Int param_val(int n) {
+        int_t param_val(int n) const {
             switch (param_mode(n)) {
                 case 0: // Position mode
                     return at(at(ip + 1 + n));
@@ -56,42 +56,45 @@ namespace intcode {
 
     public:
         explicit Program(std::istream& input) {
-            Int index = 0;
+            int_t index = 0;
             while (input) {
                 std::string s;
                 if (!std::getline(input, s, ',')) {
                     break;
                 }
-                memory[index++] = std::stoll(s);
+                memory.at(index++) = std::stoll(s);
             }
         }
 
         /**
          * Get reference to value at specified memory location.
          */
-        Int& at(Int index) {
+        int_t& at(int_t index) {
+            return memory.at(index);
+        }
+        const int_t at(int_t index) const {
             return memory.at(index);
         }
 
         /**
          * Push a value on the input queue.
          */
-        void input_push(Int value) {
+        void input_push(int_t value) {
             input.push(value);
         }
 
         /**
          * Peek at the next output value, without altering the output queue.
          */
-        Int output_peek() const {
+        int_t output_peek() const {
             return output.front();
         }
 
         /**
          * Get and the next value from the output queue.
          */
-        Int output_pop() {
-            Int value = output.front();
+        int_t output_pop() {
+            int_t value = output.front();
             output.pop();
             return value;
         }
@@ -101,7 +104,6 @@ namespace intcode {
          * program is halted (return false).
          */
         bool run() {
-
             while (at(ip) != 99) {
                 // Get two-digit opcode
                 int opcode = at(ip) % 100;

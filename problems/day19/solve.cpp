@@ -1,12 +1,10 @@
 #include <iostream>
 #include "solve.h"
 
-using namespace intcode;
-
 namespace Day19 {
 
     int solve1(std::istream& input) {
-        Program<> program(input);
+        Program program(input);
         program.run(); // Run program until first input is requested
 
         int sum = 0;
@@ -20,7 +18,7 @@ namespace Day19 {
     }
 
     int solve2(std::istream& input) {
-        Program<> program(input);
+        Program program(input);
         program.run(); // Run program until first input is requested
 
         // There are some empty spaces before this point
@@ -43,7 +41,7 @@ namespace Day19 {
         return -2;
     }
 
-    bool get_state(const Program<>& program, int x, int y) {
+    bool get_state(const Program& program, int x, int y) {
         auto clone = program;
         clone.input_push(x);
         clone.input_push(y);
