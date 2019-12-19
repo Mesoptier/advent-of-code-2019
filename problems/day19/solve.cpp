@@ -35,7 +35,7 @@ namespace Day19 {
             }
 
             // Find first position where a 100x100 square could fit in the beam
-            if (x > 99 && get_state(program, x, y)) {
+            if (x > 99 && get_state(program, x - 99, y + 99)) {
                 return (x - 99) * 10000 + y;
             }
         }
