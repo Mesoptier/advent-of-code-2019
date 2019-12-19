@@ -65,12 +65,12 @@ namespace Day19 {
         return -2;
     }
 
-    bool get_state(const Program& program, Coord pos) {
-        Program clone = program;
-        clone.input.push(pos.x);
-        clone.input.push(pos.y);
+    bool get_state(const Program<>& program, Coord pos) {
+        auto clone = program;
+        clone.input_push(pos.x);
+        clone.input_push(pos.y);
         clone.run();
-        return clone.output.front();
+        return clone.output_peek();
     }
 
     void print_grid(const Grid<char>& grid) {
@@ -101,7 +101,8 @@ namespace Day19 {
         }
     }
 
-    Program::Program(std::istream& input) {
+    template<class Int>
+    Program<Int>::Program(std::istream& input) {
         Int index = 0;
         while (input) {
             std::string s;
@@ -112,7 +113,8 @@ namespace Day19 {
         }
     }
 
-    Program::Int& Program::at(Int index) {
+    template<class Int>
+    Int& Program<Int>::at(Int index) {
         auto it = memory.find(index);
         if (it == memory.end()) {
             return memory.insert({index, 0}).first->second;
@@ -120,7 +122,8 @@ namespace Day19 {
         return it->second;
     }
 
-    bool Program::run() {
+    template<class Int>
+    bool Program<Int>::run() {
         // Number of parameters for each instruction
         int nParams[] = {0, 3, 3, 1, 1, 2, 2, 3, 3, 1};
 
@@ -132,7 +135,7 @@ namespace Day19 {
             instruction /= 100;
 
             // Get parameters
-            std::vector<Int> params; // Raw parameters
+            std::vector<Int> params; // Position parameters
             std::vector<Int> values; // Handled based parameter mode
             for (int i = 0; i < nParams[opcode]; ++i) {
                 int mode = instruction % 10;
@@ -209,4 +212,20 @@ namespace Day19 {
         return false;
     }
 
+    template<class Int>
+    void Program<Int>::input_push(Int value) {
+        input.push(value);
+    }
+
+    template<class Int>
+    Int Program<Int>::output_peek() const {
+        return output.front();
+    }
+
+    template<class Int>
+    Int Program<Int>::output_pop() {
+        Int value = output.front();
+        output.pop();
+        return value;
+    }
 }

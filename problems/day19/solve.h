@@ -43,27 +43,50 @@ namespace Day19 {
 
     void print_grid(const Grid<char>& grid);
 
-    struct Program {
-        using Int = long long int;
-
-        std::map<Int, Int> memory;
+    template<class Int=int>
+    class Program {
+    private:
+        std::unordered_map<Int, Int> memory;
         Int ip = 0; // Instruction pointer
         Int rb = 0; // Relative base
         std::queue<Int> output;
         std::queue<Int> input;
         bool halted = false;
 
+    public:
         explicit Program(std::istream& input);
 
+        /**
+         * Get reference to value at specified memory location.
+         */
         Int& at(Int index);
 
+        /**
+         * Run the program until either input is needed (return true), or the
+         * program is halted (return false).
+         */
         bool run();
+
+        /**
+         * Push a value on the input queue.
+         */
+        void input_push(Int value);
+
+        /**
+         * Peek at the next output value, without altering the output queue.
+         */
+        Int output_peek() const;
+
+        /**
+         * Get and the next value from the output queue.
+         */
+        Int output_pop();
     };
 
     int solve1(std::istream& input);
     int solve2(std::istream& input);
 
-    bool get_state(const Program& program, Coord pos);
+    bool get_state(const Program<>& program, Coord pos);
 }
 
 namespace {
