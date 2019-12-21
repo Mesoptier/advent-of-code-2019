@@ -1,3 +1,5 @@
+#include <unordered_map>
+
 template<class value_t, class map_t = std::unordered_map<size_t, value_t>>
 class infinite_array {
     map_t data;
