@@ -19,12 +19,12 @@ namespace Day21 {
             // Walk!
             "WALK\n";
 
-        program.input_push(script);
+        program.push_input(script);
         program.run();
 
         long long int output;
         while (program.has_output()) {
-            output = program.output_pop();
+            output = program.pop_output();
         }
         return output;
     }
@@ -50,12 +50,12 @@ namespace Day21 {
             // Run!
             "RUN\n";
 
-        program.input_push(script);
+        program.push_input(script);
         program.run();
 
         long long int output;
         while (program.has_output()) {
-            output = program.output_pop();
+            output = program.pop_output();
         }
         return output;
     }

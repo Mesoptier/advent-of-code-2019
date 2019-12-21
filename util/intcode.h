@@ -80,16 +80,16 @@ namespace intcode {
         /**
          * Push a value on the input queue.
          */
-        void input_push(int_t value) {
+        void push_input(int_t value) {
             input.push(value);
         }
 
         /**
          * Push each char in the provided string onto the input queue.
          */
-        void input_push(const std::string& value) {
+        void push_input(const std::string& value) {
             for (char c : value) {
-                input_push(c);
+                push_input(c);
             }
         }
 
@@ -103,14 +103,14 @@ namespace intcode {
         /**
          * Peek at the next output value, without altering the output queue.
          */
-        int_t output_peek() const {
+        int_t peek_output() const {
             return output.front();
         }
 
         /**
          * Get and the next value from the output queue.
          */
-        int_t output_pop() {
+        int_t pop_output() {
             int_t value = output.front();
             output.pop();
             return value;
@@ -121,7 +121,7 @@ namespace intcode {
          */
         void print_output() {
             while (!output.empty()) {
-                std::cout << (char)output_pop();
+                std::cout << (char) pop_output();
             }
         }
 
