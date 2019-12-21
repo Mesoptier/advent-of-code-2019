@@ -3,6 +3,7 @@
 #include <array>
 #include <queue>
 #include <cmath>
+#include <iostream>
 
 namespace {
     int pow10(int n) {
@@ -84,6 +85,22 @@ namespace intcode {
         }
 
         /**
+         * Push each char in the provided string onto the input queue.
+         */
+        void input_push(const std::string& value) {
+            for (char c : value) {
+                input_push(c);
+            }
+        }
+
+        /**
+         * Whether the output queue has values in it.
+         */
+        bool has_output() const {
+            return !output.empty();
+        }
+
+        /**
          * Peek at the next output value, without altering the output queue.
          */
         int_t output_peek() const {
@@ -97,6 +114,15 @@ namespace intcode {
             int_t value = output.front();
             output.pop();
             return value;
+        }
+
+        /**
+         * Prints the entire output queue to stdout.
+         */
+        void print_output() {
+            while (!output.empty()) {
+                std::cout << (char)output_pop();
+            }
         }
 
         /**
