@@ -6,5 +6,7 @@ set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} "-static")
 
 add_executable(App
         main.cpp
-        problems/day21/solve.cpp
+        problems/day22/solve.cpp
         )
+
+target_include_directories(App PRIVATE util)
