@@ -1,0 +1,109 @@
+Trial and mostly error:
+no items -> too light
+boulder -> too light
+boulder + mutex -> too light
+mouse -> too light
+mutex -> too light
+
+Determining relative weight:
+spool of cat6 < sand
+spool of cat6 < mouse
+spool of cat6 < astronaut ice cream
+spool of cat6 < mutex
+spool of cat6 < antenna
+boulder < sand
+boulder < mouse
+antenna < mouse
+
+All items:
+- mutex
+- spool of cat6
+- hypercube
+- astronaut ice cream
+- boulder
+- antenna
+- sand
+- mouse
+
+Result:
+- mouse
+- astronaut ice cream
+- boulder
+- sand
+
+===
+
+Hull Breach:
+north -> Hallway
+east -> Passages
+south -> Science Lab
+
+Science Lab: (astronaut ice cream)
+north -> Hull Breach
+
+Passages: (mouse)
+north -> Arcade
+south -> Warp Drive Maintenance
+west -> Hull Breach
+
+Warp Drive Maintenance: (mutex)
+north -> Passages
+south -> Kitchen
+west -> Gift Wrapping Center
+
+Gift Wrapping Center: (boulder)
+east -> Warp Drive Maintenance
+south -> Holodeck
+west -> Sick Bay
+
+Sick Bay:
+east -> Gift Wrapping Center
+
+Holodeck: (escape pod)
+north -> Gift Wrapping Center
+south -> Hot Chocolate Fountain
+
+Hot Chocolate Fountain: (photons)
+north -> Holodeck
+south -> Corridor
+
+Corridor: (molten lava)
+north -> Hot Chocolate Fountain
+west -> Storage
+
+Storage:
+east -> Corridor
+south -> Security Checkpoint
+
+Security Checkpoint:
+north -> Storage
+south -> ???
+
+Kitchen:
+north -> Warp Drive Maintenance
+
+Arcade: (spool of cat6)
+north -> Engineering
+south -> Passages
+west -> Observatory
+
+Observatory:
+north -> Stables
+east -> Arcade
+
+Stables: (infinite loop)
+south -> Observatory
+
+Engineering: (hypercube)
+east -> Crew Quarters
+south -> Arcade
+
+Crew Quarters: (sand)
+south -> Navigation
+west -> Engineering
+
+Navigation: (antenna)
+north -> Crew Quarters
+
+Hallway: (giant electromagnet)
+south -> Hull Breach

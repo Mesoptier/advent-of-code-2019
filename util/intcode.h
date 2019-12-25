@@ -28,7 +28,7 @@ namespace intcode {
         int_t rb = 0; // Relative base
         std::queue<int_t> output;
         std::queue<int_t> input;
-        bool halted = false;
+        bool _halted = false;
 
         inline int param_mode(int n) const {
             return (at(ip) / pow10(n + 2)) % 10;
@@ -125,6 +125,10 @@ namespace intcode {
             }
         }
 
+        [[nodiscard]] bool halted() const {
+            return _halted;
+        }
+
         /**
          * Run the program until either input is needed (return true), or the
          * program is halted (return false).
@@ -154,6 +158,9 @@ namespace intcode {
                     case 4: // output
                         output.push(param_val(0));
                         ip += 2;
+                        if (output.back() == '\n') {
+                            return false;
+                        }
                         break;
                     case 5: // jump-if-true
                         if (param_val(0) != 0) {
@@ -186,7 +193,7 @@ namespace intcode {
                 }
             }
 
-            halted = true;
+            _halted = true;
             return false;
         }
     };
